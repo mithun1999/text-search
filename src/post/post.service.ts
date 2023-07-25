@@ -2,13 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { PostRepository } from './post.repository';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { getSlugFromName } from 'src/util/string.util';
 
 @Injectable()
 export class PostService {
   constructor(private readonly postRepository: PostRepository) {}
 
   async create(payload: CreatePostDto) {
-    return this.postRepository.create(payload);
+    const slug = getSlugFromName(payload.title);
+    return this.postRepository.create({ ...payload, slug });
   }
 
   async update(id: string, payload: UpdatePostDto) {
@@ -21,6 +23,14 @@ export class PostService {
 
   findOne(id: string) {
     return this.postRepository.findOne({ _id: id });
+  }
+
+  async findByPage(page: number, limit: number) {
+    return this.postRepository.findByPage({ page, limit });
+  }
+
+  async search(key: string) {
+    return this.postRepository.find({ $text: { $search: key } });
   }
 
   remove(id: string) {

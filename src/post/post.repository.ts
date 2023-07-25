@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { BulkWriteResult } from 'mongodb';
-import { FilterQuery, Model } from 'mongoose';
-import { Post, PostDocument } from './schema/post.schema';
+import { FilterQuery, PaginateModel, PaginateOptions } from 'mongoose';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { Post, PostDocument } from './schema/post.schema';
 
 @Injectable()
 export class PostRepository {
-  constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
+  constructor(
+    @InjectModel(Post.name) private postModel: PaginateModel<PostDocument>,
+  ) {}
 
   async create(createPostDto: CreatePostDto): Promise<PostDocument> {
     const newPost = new this.postModel(createPostDto);
@@ -25,6 +27,13 @@ export class PostRepository {
 
   async findOne(postFilterQuery: FilterQuery<PostDocument>) {
     return this.postModel.findOne(postFilterQuery);
+  }
+
+  async findByPage(query: PaginateOptions) {
+    const options = {
+      ...query,
+    };
+    return this.postModel.paginate({}, options);
   }
 
   async findOneAndUpdate(

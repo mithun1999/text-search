@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -25,6 +26,16 @@ export class PostController {
   @Get()
   findAll() {
     return this.postService.findAll();
+  }
+
+  @Get('search')
+  async search(@Query('key') key: string) {
+    return this.postService.search(key);
+  }
+
+  @Get('page')
+  findByPage(@Query('page') page: string, @Query('limit') limit: string) {
+    return this.postService.findByPage(parseInt(page), parseInt(limit ?? '10'));
   }
 
   @Get(':id')

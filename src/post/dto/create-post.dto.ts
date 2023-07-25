@@ -12,4 +12,6 @@ export class CreatePostDto {
   @IsOptional()
   @IsString()
   author: string;
+
+  slug: string;
 }
