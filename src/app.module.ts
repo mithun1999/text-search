@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -22,6 +22,7 @@ import redisConfig from './config/redis.config';
         password: redisConfig.password,
       },
     }),
+    CacheModule.register(),
     PostModule,
   ],
   controllers: [AppController],
