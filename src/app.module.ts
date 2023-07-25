@@ -1,18 +1,13 @@
-import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
-import { APP_GUARD } from "@nestjs/core";
-import { MongooseModule } from "@nestjs/mongoose";
-import { ScheduleModule } from "@nestjs/schedule";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
-import databaseConfig from "./config/database.config";
-import { AuthenticationModule } from "./domains/account/authentication/authentication.module";
-import { RolesGuard } from "./domains/account/authentication/provider/supabase/guard/role.guard";
-import { UserModule } from "./domains/account/user/user/user.module";
-import { MediaModule } from "./domains/media/media.module";
-import { BullModule } from "@nestjs/bull";
-import redisConfig from "./config/redis.config";
-import { IdentityModule } from "./domains/identity/identity.module";
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ScheduleModule } from '@nestjs/schedule';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import databaseConfig from './config/database.config';
+import { BullModule } from '@nestjs/bull';
+import { PostModule } from './post/post.module';
+import redisConfig from './config/redis.config';
 
 @Module({
   imports: [
@@ -27,12 +22,9 @@ import { IdentityModule } from "./domains/identity/identity.module";
         password: redisConfig.password,
       },
     }),
-    UserModule,
-    AuthenticationModule,
-    MediaModule,
-    IdentityModule,
+    PostModule,
   ],
   controllers: [AppController],
-  providers: [AppService, { provide: APP_GUARD, useClass: RolesGuard }],
+  providers: [AppService],
 })
 export class AppModule {}
