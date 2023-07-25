@@ -1,14 +1,14 @@
-import { CacheModule, Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { BullModule } from '@nestjs/bull';
+import { CacheModule, CacheStore, Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
+import { redisStore } from 'cache-manager-redis-yet';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import databaseConfig from './config/database.config';
-import { BullModule } from '@nestjs/bull';
-import { PostModule } from './post/post.module';
 import redisConfig from './config/redis.config';
-
+import { PostModule } from './post/post.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -22,7 +22,24 @@ import redisConfig from './config/redis.config';
         password: redisConfig.password,
       },
     }),
-    CacheModule.register(),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      useFactory: async () => {
+        const store = await redisStore({
+          socket: {
+            host: redisConfig.host,
+            port: Number(redisConfig.port),
+          },
+          password: redisConfig.password,
+          ttl: Number(redisConfig.ttl),
+        });
+        return {
+          store: store as unknown as CacheStore,
+        };
+      },
+      inject: [ConfigService],
+    }),
     PostModule,
   ],
   controllers: [AppController],

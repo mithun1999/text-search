@@ -26,7 +26,7 @@ export class PostRepository {
   }
 
   async findOne(postFilterQuery: FilterQuery<PostDocument>) {
-    return this.postModel.findOne(postFilterQuery);
+    return this.postModel.findOne(postFilterQuery).lean();
   }
 
   async findByPage(query: PaginateOptions) {

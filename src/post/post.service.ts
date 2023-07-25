@@ -1,12 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PostRepository } from './post.repository';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { getSlugFromName } from 'src/util/string.util';
+import { CACHE_MANAGER } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class PostService {
-  constructor(private readonly postRepository: PostRepository) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly postRepository: PostRepository,
+  ) {}
 
   async create(payload: CreatePostDto) {
     const slug = getSlugFromName(payload.title);
@@ -30,7 +35,15 @@ export class PostService {
   }
 
   async search(key: string) {
-    return this.postRepository.find({ $text: { $search: key } });
+    const cachedVal = await this.cacheManager.get(`search-${key}`);
+    if (!cachedVal) {
+      const results = await this.postRepository.find({
+        $text: { $search: key },
+      });
+      await this.cacheManager.set(`search-${key}`, JSON.stringify(results));
+      return results;
+    }
+    return JSON.parse(cachedVal);
   }
 
   remove(id: string) {

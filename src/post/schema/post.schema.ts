@@ -26,4 +26,3 @@ PostSchema.index({ body: 'text', title: 'text' });
 
 PostSchema.plugin(uniqueValidator, { type: 'MongooseError' });
 PostSchema.plugin(mongoosePaginate);
-
