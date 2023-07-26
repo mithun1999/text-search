@@ -1,17 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-} from '@nestjs/common';
-import { PostService } from './post.service';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { CreatePostDto } from './dto/create-post.dto';
+import { PostService } from './post.service';
 
 @ApiTags('Post')
 @Controller('post')
@@ -29,27 +19,20 @@ export class PostController {
   }
 
   @Get('search')
-  async search(@Query('key') key: string) {
-    return this.postService.search(key);
+  async search(
+    @Query('key') key: string,
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+  ) {
+    return this.postService.search(
+      key,
+      parseInt(page),
+      parseInt(limit ?? '10'),
+    );
   }
 
-  @Get('page')
-  findByPage(@Query('page') page: string, @Query('limit') limit: string) {
-    return this.postService.findByPage(parseInt(page), parseInt(limit ?? '10'));
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(id, updatePostDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(id);
+  @Get('slug/:slug')
+  findBySlug(@Param('slug') slug: string) {
+    return this.postService.findBySlug(slug);
   }
 }
