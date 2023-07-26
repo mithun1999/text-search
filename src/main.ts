@@ -10,8 +10,8 @@ async function bootstrap() {
 
   // Swagger setup
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('Merchify API')
-    .setDescription('Merchify NestJS API')
+    .setTitle('Text Project API')
+    .setDescription('Text Project NestJS API')
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document);
